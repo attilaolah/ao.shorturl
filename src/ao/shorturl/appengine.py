@@ -1,7 +1,7 @@
 from ao.shorturl import ShortUrlHandler
 
 from google.appengine.api import memcache
-from google.appengine.ext import db import
+from google.appengine.ext import db
 
 
 class ShortUrl(db.Model):
