@@ -20,10 +20,6 @@ setup(
     packages=find_packages('src'),
     include_package_data=True,
     zip_safe=True,
-    install_requires=(
-        'zope.component',
-        'zope.interface',
-    ),
     tests_require=(
         'zope.testing',
     ),
