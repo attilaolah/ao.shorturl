@@ -53,6 +53,11 @@ class ShortUrlHandler(object):
         for (k, v) in config.iteritems():
             setattr(self, k, v)
 
+    def get_context(self, token):
+        """Look up the context object for the token."""
+
+        raise NotImplementedError('You must provide a `get_context` method.')
+
     def get_token(self, url):
         """Try to get a token for the given url.
 
@@ -72,10 +77,12 @@ class ShortUrlHandler(object):
 
     def get_token_from_cache(self, url):
         """Overload this method to use memcached."""
+
         raise LookupError
 
     def get_token_from_db(self, url):
         """Overload this method to use the database/datastore."""
+
         raise LookupError
 
     def generate_url(self, len=None, elems=None):
