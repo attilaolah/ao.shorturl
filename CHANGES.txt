@@ -1,7 +1,31 @@
-1.0.1 (unreleased)
+Changelog
+=========
+
+
+1.1.2 (2010-03-19)
+==================
+
+* Updated the documentation
+
+
+1.1.2 (2010-03-19)
+==================
+
+* Updated the documentation
+
+
+1.1.1 (2010-03-19)
+==================
+
+* Updated the documentation
+
+
+1.1.0 (2010-03-19)
 ==================
 
 * Added some unit tests
+* Changed the way registering and getting handlers work
+
 
 1.0.0 (2010-03-19)
 ==================
@@ -9,3 +33,5 @@
 * First public release
 * Added Django template tag
 * Added App Engine backend
+
+

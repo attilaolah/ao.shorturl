@@ -4,15 +4,18 @@ import string
 
 try:
     from ao.shorturl.interfaces import IShortUrl, IShortUrlHandler
-    from zope.component import queryUtility
+    from zope.component import queryUtility, getSiteManager
     from zope.interface import implements
 except ImportError:
     # If zope.component and zope.interface are not available, that's still ok,
     # we will fall back to getting the configuration as a parameter.
     implements, IShortUrl, IShortUrlHandler = lambda x: None, None, None
 
+handler = None
 
-shorturl = None
+
+class ImproperlyConfigured(Exception):
+    """Indicates that the short url handler is not configured properly."""
 
 
 class ShortUrlNotFound(LookupError):
@@ -24,37 +27,44 @@ class ShortUrlNotFound(LookupError):
     """
 
 
-def getHandler():
-    """Get the nearest available handler."""
+def getHandler(name=''):
+    """Get the handler for the given name."""
 
-    try:
-        return queryUtility(IShortUrl).handler
-    except NameError:
+    if name == '':
+        global handler
+    else:
         try:
-            return shorturl.handler  # fall back to the module global
-        except AttributeError:
-            raise ValueError('ShortUrl module not initialized.')
-
-
-class ShortUrl(object):
-    """Base object for handling short URLs."""
-
-    implements(IShortUrl)
-
-    def __init__(self, handler=None, **config):
-        """Initialize the object by setting loking up the handler."""
-
-        try:
-            self.handler = queryUtility(IShortUrlHandler)
+            handler = queryUtility(IShortUrlHandler, name=name)
         except NameError:
-            handler = handler or ShortUrlHandler  # fall back to the default
-            self.handler = handler(config)
+            raise ImproperlyConfigured('To use named handlers, you need to '\
+                'make the `zope.component` package available.')
 
-        global shorturl
-        shorturl = self  # set the module global
+    if handler is None:
+        raise ImproperlyConfigured('The requested handler is not initialized.')
+
+    return handler
 
 
-class ShortUrlHandler(object):
+def registerHandler(handler=None, name='', **config):
+    """Register a handler for the given name."""
+
+    handler = (handler or BaseShortUrlHandler)(config)
+
+    if name == '':
+        globals()['handler'] = handler
+
+    else:
+        try:
+            manager = getSiteManager()
+        except NameError:
+            raise ImproperlyConfigured('To use named handlers, you need to '\
+                'make the `zope.component` package available.')
+        manager.registerUtility(handler, IShortUrlHandler, name=name)
+
+    return handler
+
+
+class BaseShortUrlHandler(object):
     """Default short URL handler.
 
     This class contains a set of defaults for the Short URL handler.

@@ -1,17 +1,18 @@
+import os
 from setuptools import find_packages, setup
 
 
 setup(
     # Package information:
     name='ao.shorturl',
-    version='1.0.1',
+    version='1.1.3',
     license='GNU GPL',
     url='http://github.com/aatiis/ao.shorturl',
     description='Reusable url shortener and lookup library.',
     long_description=\
         open('README.txt').read() + \
-        'Changelog\n' + \
-        '=========\n' + \
+        open(os.path.join('src', 'ao', 'shorturl', 'shorturl.txt')).read() + \
+        open('TODO.txt').read() + \
         open('CHANGES.txt').read(),
     # Author information:
     author='Attila Olah',
@@ -22,11 +23,15 @@ setup(
     include_package_data=True,
     zip_safe=True,
     tests_require=(
+        'zope.component',
+        'zope.interface',
         'zope.testing',
     ),
     extras_require={
         'test': (
-            'zope.testing'
+            'zope.component',
+            'zope.interface',
+            'zope.testing',
         ),
         'docs': (
             'Sphinx',

@@ -1,0 +1,8 @@
+TODO
+====
+
+* Improve documentation
+* Get 100% test coverage
+* Add backends for Django Models and SQLAlchemy/Elixir
+
+

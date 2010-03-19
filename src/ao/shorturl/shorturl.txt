@@ -1,0 +1,128 @@
+Using the short URL library without any framework
+=================================================
+
+
+Registering and getting handlers
+--------------------------------
+
+To use the library, you need to register a _handler_ first, using the
+`ao.shorturl.registerHandler()` function. To get back the handler, use the
+`getHandler()` function.
+
+    >>> from ao.shorturl import getHandler
+    >>> getHandler()
+    Traceback (most recent call last):
+    ...
+    ImproperlyConfigured: The requested handler is not initialized.
+
+    >>> from ao.shorturl import registerHandler
+    >>> handler = registerHandler()
+    >>> getHandler() is handler
+    True
+    >>> handler
+    <ao.shorturl.BaseShortUrlHandler object at ...>
+
+Note that if you intend to use multiple handlers, you need to give them
+_names_, as the default handler is stored as a module global. However, to
+utilize named handlers, you need to make the `zope.component` and
+`zope.interface` packages available. Each handler is stored in the local site,
+meaning that if you use multiple sites, you can have different handlers with
+the same name on a per-site basis. However, the unnamed handler is still a
+_module global_, so take thet in consideration when using multiple handlers
+and sites.
+
+    >>> foo = registerHandler(name='foo')
+    >>> getHandler(name='foo') is getHandler('foo') is foo
+    True
+
+If you don't have the `zope.componene` and `zope.interface` packages
+available, you won't be able to use named handlers.
+
+    >>> def nope(*args, **kw):
+    ...     raise NameError('Guess this is not available')
+    ...
+    >>> import zope.component
+    >>> zope.component.getSiteManager = nope
+    >>> zope.component.queryUtility = nope
+    >>> import ao.shorturl
+    >>> reload(ao.shorturl)
+    <module 'ao.shorturl' from ...>
+
+    >>> foo = registerHandler(name='bar')
+    Traceback (most recent call last):
+    ...
+    ImproperlyConfigured: To use named handlers, you need to make the ...
+
+    >>> getHandler('bar')
+    Traceback (most recent call last):
+    ...
+    ImproperlyConfigured: To use named handlers, you need to make the ...
+
+
+Configuring the handler
+-----------------------
+
+To overwrite any default handler configuration, just pass the apropriate
+keyword argument to the `ao.shorturl.registerHandler()` function.
+
+    >>> len(registerHandler().generate_url())
+    6
+
+    >>> len(registerHandler(url_length=10).generate_url())
+    10
+
+    >>> registerHandler(url_length=10, url_elems='x').generate_url()
+    'xxxxxxxxxx'
+
+
+Using custom handlers
+---------------------
+
+When calling `ao.shorturl.registerHandler()` without a `handler` argument, it
+will not have any real functionality.
+
+    >>> registerHandler().assign_url(None)
+    Traceback (most recent call last):
+    ...
+    NotImplementedError: You myst overload `assign_url`.
+
+    >>> registerHandler().construct_url(None)
+    Traceback (most recent call last):
+    ...
+    NotImplementedError: You myst overload `construct_url`.
+
+Registering a custom handler is easy, just subclass
+`ao.shorturl.BaseShortUrlHandler`.
+
+    >>> from ao.shorturl import BaseShortUrlHandler
+    >>> class FancyShortUrlHandler(BaseShortUrlHandler):
+    ...     def assign_url(self, context):
+    ...         context['shorturl'] = self.generate_url()
+    ...
+    >>> handler = registerHandler(handler=FancyShortUrlHandler, url_length=20)
+    >>> handler
+    <FancyShortUrlHandler object at ...>
+
+    >>> context = {'foo': 'bar'}
+    >>> handler.assign_url(context)
+    >>> len(context['shorturl']) == 20
+    True
+
+As for now, there's one custom handler provided for App Engine:
+`ao.shorturl.appengine.AppEngineShortUrlHandler`. It uses the datastore API to
+store the short url associations and the memcache API to cache the keys for
+better performance.
+
+
+Using Django template tags
+--------------------------
+
+If you use Django, you can access an object's short URL from a template with
+the `shorturl` template tag. To use it, add `ao.shorturl` to your
+`INSTALLED_APPS`. Then in the template you can load the tag with `{% load
+shorturl %}` abd use it with somethin like `<a href="{ shorturl city }">{{
+city.name }}</a>`
+
+Note that this will create an _absolute_ url.
+
+

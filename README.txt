@@ -1,5 +1,5 @@
-ao.shorturl - a reusable short URL library
-==========================================
+In a nutshell
+=============
 
 `ao.shorturl` is a library for integrating short URLs to a web application.
 Its front-end configuration is not specific to any web application framework,
@@ -10,9 +10,4 @@ For example, `ao.shorturl.appengine` implements a Datastore backand for Google
 provides a template tag for easily displaying short URLs for any object that
 supports them.
 
-TODO
-====
 
-* Write some documentation (high prio)
-* Get it 100% unit-tested (high prio)
-* Add backends for Django Models and SQLAlchemy/Elixir (low prio)
