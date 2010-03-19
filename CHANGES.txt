@@ -1,0 +1,6 @@
+1.0.0 (unreleased)
+==================
+
+* First public release
+* Added Django template tag
+* Added App Engine backend
