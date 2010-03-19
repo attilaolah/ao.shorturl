@@ -28,7 +28,7 @@ utilize named handlers, you need to make the `zope.component` and
 `zope.interface` packages available. Each handler is stored in the local site,
 meaning that if you use multiple sites, you can have different handlers with
 the same name on a per-site basis. However, the unnamed handler is still a
-_module global_, so take thet in consideration when using multiple handlers
+_module_global_, so take thet in consideration when using multiple handlers
 and sites.
 
     >>> foo = registerHandler(name='foo')

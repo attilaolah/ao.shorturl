@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 setup(
     # Package information:
     name='ao.shorturl',
-    version='1.1.3',
+    version='1.1.4',
     license='GNU GPL',
     url='http://github.com/aatiis/ao.shorturl',
     description='Reusable url shortener and lookup library.',
