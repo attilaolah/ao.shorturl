@@ -4,14 +4,15 @@ from setuptools import find_packages, setup
 setup(
     # Package information:
     name='ao.shorturl',
-    version='1.0.0',
+    version='1.0.1',
     license='GNU GPL',
     url='http://github.com/aatiis/ao.shorturl',
     description='Reusable url shortener and lookup library.',
-    long_description='%s\n\n%s'%(
-        open('README.txt').read(),
+    long_description=\
+        open('README.txt').read() + \
+        'Changelog\n' + \
+        '=========\n' + \
         open('CHANGES.txt').read(),
-    ),
     # Author information:
     author='Attila Olah',
     author_email='attilaolah@gmail.com',
