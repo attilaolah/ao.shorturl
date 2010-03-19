@@ -3,7 +3,7 @@ import string
 
 
 try:
-    from ao.shorturl.interfaces import IShortUrl, IShortUrlHandler
+    from ao.shorturl.interfaces import IShortUrlHandler
     from zope.component import queryUtility, getSiteManager
     from zope.interface import implements
 except ImportError:
