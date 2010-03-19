@@ -3,13 +3,16 @@ import string
 
 
 try:
-    from ao.shorturl.interfaces import IShortUrlHandler
+    from ao.shorturl.interfaces import IShortUrl, IShortUrlHandler
     from zope.component import queryUtility
     from zope.interface import implements
 except ImportError:
     # If zope.component and zope.interface are not available, that's still ok,
     # we will fall back to getting the configuration as a parameter.
-    implements, IShortUrlHandler = lambda x: None, None
+    implements, IShortUrl, IShortUrlHandler = lambda x: None, None, None
+
+
+shorturl = None
 
 
 class ShortUrlNotFound(LookupError):
@@ -21,9 +24,22 @@ class ShortUrlNotFound(LookupError):
     """
 
 
+def getHandler():
+    """Get the nearest available handler."""
+
+    try:
+        return queryUtility(IShortUrl).handler
+    except NameError:
+        try:
+            return shorturl.handler  # fall back to the module global
+        except AttributeError:
+            raise ValueError('ShortUrl module not initialized.')
+
+
 class ShortUrl(object):
     """Base object for handling short URLs."""
 
+    implements(IShortUrl)
 
     def __init__(self, handler=None, **config):
         """Initialize the object by setting loking up the handler."""
@@ -31,10 +47,11 @@ class ShortUrl(object):
         try:
             self.handler = queryUtility(IShortUrlHandler)
         except NameError:
-            self.handler = handler
+            handler = handler or ShortUrlHandler  # fall back to the default
+            self.handler = handler(config)
 
-        if self.handler is None:
-            self.handler = ShortUrlHandler(config)  # fall back to the default
+        global shorturl
+        shorturl = self  # set the module global
 
 
 class ShortUrlHandler(object):
@@ -42,19 +59,20 @@ class ShortUrlHandler(object):
 
     This class contains a set of defaults for the Short URL handler.
 
+    * `url_cache_time` is the maximum lifetime of a (url, key) pair in cache.
     * `url_elems` is a sequence that is used when generating new URLs.
     * `url_length` is the length of the generated URLs.
-    * `url_prefx` is the path that prefixes the URLs, defaults to '/'.
-    * `url_cache_time` is the maximum lifetime of a (url, key) pair in cache.
+    * `url_prefx` is the path that prefixes the URLs.
 
     """
 
     implements(IShortUrlHandler)
 
+    url_cache_time = 1200
     url_elems = string.digits + string.ascii_letters
     url_length = 6
     url_prefix = '/'
-    url_cache_time = 1200
+    url_pattern = lambda self, x: self.url_prefix + x
 
     def __init__(self, config={}):
         """Initialize using the given configuration."""
@@ -121,3 +139,8 @@ class ShortUrlHandler(object):
         """Create a new URL for the context and assign it to the context."""
 
         raise NotImplementedError('You myst overload `assign_url`.')
+
+    def construct_url(self, context):
+        """Construct the short url for the given context."""
+
+        raise NotImplementedError('You myst overload `construct_url`.')

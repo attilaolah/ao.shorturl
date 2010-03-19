@@ -46,3 +46,11 @@ class ShortUrlHandler(ShortUrlHandler):
 
         url = ShortUrl(key_name=self.generate_url(), context=context)
         url.put()
+
+    def construct_url(self, context, request=None):
+        """Construct the short url for the given context."""
+
+        if context.shorturl.count() == 0:
+            self.assign_url(context)  # create a new short url
+
+        return self.url_pattern(context.shorturl[0].key().name())
