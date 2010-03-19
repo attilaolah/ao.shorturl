@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<configure xmlns="http://namespaces.zope.org/zope">
+   
+  <utility provides=".interfaces.IShortUrl"
+           factory=".ShortUrl"
+           />
+
+  <utility provides=".interfaces.IShortUrlHandler"
+           factory=".ShortUrlHandler"
+           />
+
+</configure>
