@@ -7,8 +7,8 @@ instead it uses various back-ends for different frameworks.
 
 For example, `ao.shorturl.appengine` implements a Datastore backand for Google
 / Typhoon App Engine. If installed as a Django application, `ao.shorturl` also
-provides a template tag for easily displaying short urls for any object that
-supports short URLs.
+provides a template tag for easily displaying short URLs for any object that
+supports them.
 
 TODO
 ====
