@@ -23,12 +23,14 @@ setup(
     include_package_data=True,
     zip_safe=True,
     tests_require=(
+        'minimock',
         'zope.component',
         'zope.interface',
         'zope.testing',
     ),
     extras_require={
         'test': (
+            'minimock',
             'zope.component',
             'zope.interface',
             'zope.testing',

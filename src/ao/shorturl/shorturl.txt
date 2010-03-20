@@ -35,20 +35,23 @@ and sites.
     >>> getHandler(name='foo') is getHandler('foo') is foo
     True
 
-If you don't have the `zope.componene` and `zope.interface` packages
+If you don't have the `zope.component` and `zope.interface` packages
 available, you won't be able to use named handlers.
 
-    >>> def nope(*args, **kw):
-    ...     raise NameError('Guess this is not available')
+    >>> import __builtin__
+    >>> realimport = __builtin__.__import__
+    >>> def fakeimport(name, *args, **kw):
+    ...     if name == 'zope':
+    ...         raise ImportError
+    ...     realimport(name, *args, **kw)
     ...
-    >>> import zope.component
-    >>> zope.component.getSiteManager = nope
-    >>> zope.component.queryUtility = nope
+    >>> __builtin__.__import__XXX_TODO = fakeimport
+
     >>> import ao.shorturl
     >>> reload(ao.shorturl)
     <module 'ao.shorturl' from ...>
 
-    >>> foo = registerHandler(name='bar')
+    >>> registerHandler(name='bar')
     Traceback (most recent call last):
     ...
     ImproperlyConfigured: To use named handlers, you need to make the ...
@@ -57,6 +60,8 @@ available, you won't be able to use named handlers.
     Traceback (most recent call last):
     ...
     ImproperlyConfigured: To use named handlers, you need to make the ...
+
+    >>> __builtin__.__import__ = realimport
 
 
 Configuring the handler
@@ -98,6 +103,10 @@ Registering a custom handler is easy, just subclass
     >>> class FancyShortUrlHandler(BaseShortUrlHandler):
     ...     def assign_url(self, context):
     ...         context['shorturl'] = self.generate_url()
+    ...     def get_context_from_cache(self, url):
+    ...         if context['shorturl'] == url:
+    ...             return context
+    ...         raise LookupError
     ...
     >>> handler = registerHandler(handler=FancyShortUrlHandler, url_length=20)
     >>> handler
@@ -114,14 +123,30 @@ store the short url associations and the memcache API to cache the keys for
 better performance.
 
 
+Getting the context from the handler
+------------------------------------
+
+In your view (if you're using an MCV framework), you can call the handler's
+`get_context()` method to query the context for a given short url.
+
+    >>> handler.get_context('xxx')
+    Traceback (most recent call last):
+    ...
+    ShortUrlNotFound: Short URL could not be found: xxx
+
+    >>> handler.get_context(context['shorturl']) is context
+    True
+
+
 Using Django template tags
 --------------------------
 
 If you use Django, you can access an object's short URL from a template with
 the `shorturl` template tag. To use it, add `ao.shorturl` to your
-`INSTALLED_APPS`. Then in the template you can load the tag with `{% load
-shorturl %}` abd use it with somethin like `<a href="{ shorturl city }">{{
-city.name }}</a>`
+`INSTALLED_APPS`. Then in the template you can do something like this:
+
+    {% load shorturl %}
+    <a href="{ shorturl city }">{{ city.name }}</a>
 
 Note that this will create an _absolute_ url.
 

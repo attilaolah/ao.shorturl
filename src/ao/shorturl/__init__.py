@@ -4,8 +4,7 @@ import string
 
 try:
     from ao.shorturl.interfaces import IShortUrlHandler
-    from zope.component import queryUtility, getSiteManager
-    from zope.interface import implements
+    from zope import component, interface
 except ImportError:
     # If zope.component and zope.interface are not available, that's still ok,
     # we will fall back to getting the configuration as a parameter.
@@ -34,7 +33,7 @@ def getHandler(name=''):
         global handler
     else:
         try:
-            handler = queryUtility(IShortUrlHandler, name=name)
+            handler = component.queryUtility(IShortUrlHandler, name=name)
         except NameError:
             raise ImproperlyConfigured('To use named handlers, you need to '\
                 'make the `zope.component` package available.')
@@ -55,7 +54,7 @@ def registerHandler(handler=None, name='', **config):
 
     else:
         try:
-            manager = getSiteManager()
+            manager = component.getSiteManager()
         except NameError:
             raise ImproperlyConfigured('To use named handlers, you need to '\
                 'make the `zope.component` package available.')
@@ -74,9 +73,21 @@ class BaseShortUrlHandler(object):
     * `url_length` is the length of the generated URLs.
     * `url_prefx` is the path that prefixes the URLs.
 
+    Verify that the class implements the interface:
+
+        >>> from zope.interface.verify import verifyClass
+        >>> verifyClass(IShortUrlHandler, BaseShortUrlHandler)
+        True
+
+    Verify that the object provides the interface:
+
+        >>> from zope.interface.verify import verifyObject
+        >>> verifyObject(IShortUrlHandler, BaseShortUrlHandler())
+        True
+
     """
 
-    implements(IShortUrlHandler)
+    interface.implements(IShortUrlHandler)
 
     url_cache_time = 1200
     url_elems = string.digits + string.ascii_letters
@@ -120,7 +131,7 @@ class BaseShortUrlHandler(object):
         raise LookupError
 
     def get_context_from_db(self, url):
-        """Overload this method to use the database/datastore."""
+        """Overload this method to look up the context in the database."""
 
         raise LookupError
 
