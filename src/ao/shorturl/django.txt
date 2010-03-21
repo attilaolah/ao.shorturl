@@ -2,15 +2,15 @@ Using with Django and template tags
 -----------------------------------
 
 If you use Django, you can access an object's short URL from a template with
-the `shorturl` template tag. To use it, add `ao.shorturl` to your
-`INSTALLED_APPS`. Then in the template you can do something like this:::
+the ``shorturl`` template tag. To use it, add ``ao.shorturl`` to your
+``INSTALLED_APPS``. Then in the template you can do something like this::
 
     {% load shorturl %}
     <a href="{ shorturl city }">{{ city.name }}</a>
 
-Note that this will create an _absolute_ url.
+Note that this will create an *absolute* url.
 
-Test the template tag:::
+Test the template tag::
 
     >>> from ao.shorturl.templatetags import shorturl
 
@@ -28,7 +28,7 @@ Test the template tag:::
     ...
     NotImplementedError: You must overload `construct_url`.
 
-Clean up after the tests:::
+Clean up after the tests::
 
     >>> from zope.testing import cleanup
     >>> cleanup.cleanUp()

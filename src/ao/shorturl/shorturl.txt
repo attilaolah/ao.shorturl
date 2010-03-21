@@ -5,9 +5,9 @@ Using the short URL library without any framework
 Registering and getting handlers
 --------------------------------
 
-To use the library, you need to register a _handler_ first, using the
-`ao.shorturl.registerHandler()` function. To get back the handler, use the
-`getHandler()` function.::
+To use the library, you need to register a *handler* first, using the
+``ao.shorturl.registerHandler()`` function. To get back the handler, use the
+``getHandler()`` function::
 
     >>> from ao import shorturl
     >>> shorturl.getHandler()
@@ -22,22 +22,22 @@ To use the library, you need to register a _handler_ first, using the
     <ao.shorturl.BaseShortUrlHandler object at ...>
 
 Note that if you intend to use multiple handlers, you need to give them
-_names_, as the default handler is stored as a module global. However, to
-utilize named handlers, you need to make the `zope.component` and
-`zope.interface` packages available. Each handler is stored in the local site,
-meaning that if you use multiple sites, you can have different handlers with
-the same name on a per-site basis. However, the unnamed handler is still a
-_module_ _global_, so take thet in consideration when using multiple handlers
-and sites.::
+*names*, as the default handler is stored as a module global. However, to
+utilize named handlers, you need to make the ``zope.component`` and
+``zope.interface`` packages available. Each handler is stored in the local
+site, meaning that if you use multiple sites, you can have different handlers
+with the same name on a per-site basis. However, the unnamed handler is still
+a *module* *global*, so take thet in consideration when using multiple
+handlers and sites::
 
     >>> foo = shorturl.registerHandler(name='foo')
     >>> shorturl.getHandler(name='foo') is shorturl.getHandler('foo') is foo
     True
 
-If you don't have the `zope.component` and `zope.interface` packages
+If you don't have the ``zope.component`` and ``zope.interface`` packages
 available, you won't be able to use named handlers.
 
-Let's pretend we don't have `zope.component` and `zope.interface`:::
+Let's pretend we don't have ``zope.component`` and ``zope.interface``::
 
     >>> import sys
 
@@ -72,7 +72,7 @@ Let's pretend we don't have `zope.component` and `zope.interface`:::
     ...
     ImproperlyConfigured: To use named handlers, you need to make the ...
 
-Remove our import hook:::
+Remove our import hook::
 
     >>> del sys.meta_path[0]
 
@@ -81,7 +81,7 @@ Configuring the handler
 -----------------------
 
 To overwrite any default handler configuration, just pass the apropriate
-keyword argument to the `ao.shorturl.registerHandler()` function.::
+keyword argument to the ``ao.shorturl.registerHandler()`` function::
 
     >>> len(shorturl.registerHandler().generate_url())
     6
@@ -96,8 +96,8 @@ keyword argument to the `ao.shorturl.registerHandler()` function.::
 Using custom handlers
 ---------------------
 
-When calling `ao.shorturl.registerHandler()` without a `handler` argument, it
-will not have any real functionality.::
+When calling ``ao.shorturl.registerHandler()`` without a ``handler`` argument,
+it will not have any real functionality::
 
     >>> shorturl.registerHandler().assign_url(None)
     Traceback (most recent call last):
@@ -110,7 +110,7 @@ will not have any real functionality.::
     NotImplementedError: You must overload `construct_url`.
 
 Registering a custom handler is easy, just subclass
-`ao.shorturl.BaseShortUrlHandler`.::
+``ao.shorturl.BaseShortUrlHandler``::
 
     >>> class FancyShortUrlHandler(shorturl.BaseShortUrlHandler):
     ...     def assign_url(self, context):
@@ -130,8 +130,8 @@ Registering a custom handler is easy, just subclass
     True
 
 As for now, there's one custom handler provided for App Engine:
-`ao.shorturl.appengine.AppEngineShortUrlHandler`. It uses the datastore API to
-store the short url associations and the memcache API to cache the keys for
+``ao.shorturl.appengine.AppEngineShortUrlHandler``. It uses the datastore API
+to store the short url associations and the memcache API to cache the keys for
 better performance.
 
 
@@ -139,7 +139,7 @@ Getting the context from the handler
 ------------------------------------
 
 In your view (if you're using an MCV framework), you can call the handler's
-`get_context()` method to query the context for a given short url.::
+``get_context()`` method to query the context for a given short url::
 
     >>> handler.get_context('xxx')
     Traceback (most recent call last):
@@ -149,8 +149,8 @@ In your view (if you're using an MCV framework), you can call the handler's
     >>> handler.get_context(context['shorturl']) is context
     True
 
-Note that `ao.shorturl.get_context()` will be called at least once each time a
-new short url is created, to check for duplicates.::
+Note that ``ao.shorturl.get_context()`` will be called at least once each time a
+new short url is created, to check for duplicates::
 
     >>> fired = False
     >>> def get_context(name):
@@ -168,7 +168,7 @@ new short url is created, to check for duplicates.::
     This URL already exists!
     '...'
 
-Clean up after the tests:::
+Clean up after the tests::
 
     >>> from zope.testing import cleanup
     >>> cleanup.cleanUp()
