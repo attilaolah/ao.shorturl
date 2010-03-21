@@ -6,6 +6,7 @@ docfiles = ('shorturl.txt', 'django.txt')
 
 docstrings = ('ao.shorturl',)
 
+
 def test_suite():
     """Run all doctests in one test suite."""
 
