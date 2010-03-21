@@ -4,11 +4,22 @@ import string
 
 try:
     from ao.shorturl.interfaces import IShortUrlHandler
-    from zope import component, interface
+    import zope.component as zc
+    import zope.interface as zi
 except ImportError:
     # If zope.component and zope.interface are not available, that's still ok,
     # we will fall back to getting the configuration as a parameter.
-    implements, IShortUrl, IShortUrlHandler = lambda x: None, None, None
+
+    IShortUrlHandler = None
+
+    class zi(object):
+        """Fallback for `zope.interface`."""
+
+        def implements(self, *args, **kw):
+            pass
+
+    zi = zi()
+
 
 handler = None
 
@@ -33,7 +44,7 @@ def getHandler(name=''):
         global handler
     else:
         try:
-            handler = component.queryUtility(IShortUrlHandler, name=name)
+            handler = zc.queryUtility(IShortUrlHandler, name=name)
         except NameError:
             raise ImproperlyConfigured('To use named handlers, you need to '\
                 'make the `zope.component` package available.')
@@ -54,7 +65,7 @@ def registerHandler(handler=None, name='', **config):
 
     else:
         try:
-            manager = component.getSiteManager()
+            manager = zc.getSiteManager()
         except NameError:
             raise ImproperlyConfigured('To use named handlers, you need to '\
                 'make the `zope.component` package available.')
@@ -87,7 +98,7 @@ class BaseShortUrlHandler(object):
 
     """
 
-    interface.implements(IShortUrlHandler)
+    zi.implements(IShortUrlHandler)
 
     url_cache_time = 1200
     url_elems = string.digits + string.ascii_letters
@@ -149,7 +160,7 @@ class BaseShortUrlHandler(object):
         elems = elems or self.url_elems
 
         while True:
-            url = ''.join(map(random.choice, (elems for x in xrange(len))))
+            url = ''.join((random.choice(elems) for x in xrange(len)))
             try:
                 self.get_context(url)
                 continue
@@ -159,9 +170,9 @@ class BaseShortUrlHandler(object):
     def assign_url(self, context):
         """Create a new URL for the context and assign it to the context."""
 
-        raise NotImplementedError('You myst overload `assign_url`.')
+        raise NotImplementedError('You must overload `assign_url`.')
 
     def construct_url(self, context):
         """Construct the short url for the given context."""
 
-        raise NotImplementedError('You myst overload `construct_url`.')
+        raise NotImplementedError('You must overload `construct_url`.')

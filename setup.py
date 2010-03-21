@@ -5,13 +5,14 @@ from setuptools import find_packages, setup
 setup(
     # Package information:
     name='ao.shorturl',
-    version='1.1.4',
+    version='1.1.5',
     license='GNU GPL',
     url='http://github.com/aatiis/ao.shorturl',
     description='Reusable url shortener and lookup library.',
     long_description=\
         open('README.txt').read() + \
         open(os.path.join('src', 'ao', 'shorturl', 'shorturl.txt')).read() + \
+        open(os.path.join('src', 'ao', 'shorturl', 'django.txt')).read() + \
         open('TODO.txt').read() + \
         open('CHANGES.txt').read(),
     # Author information:

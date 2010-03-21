@@ -2,13 +2,9 @@ import doctest
 import unittest
 
 
-docfiles = (
-    'shorturl.txt',
-)
+docfiles = ('shorturl.txt', 'django.txt')
 
-docstrings = (
-    'ao.shorturl',
-)
+docstrings = ('ao.shorturl',)
 
 def test_suite():
     """Run all doctests in one test suite."""

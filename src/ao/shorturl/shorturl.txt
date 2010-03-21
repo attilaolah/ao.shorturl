@@ -9,15 +9,14 @@ To use the library, you need to register a _handler_ first, using the
 `ao.shorturl.registerHandler()` function. To get back the handler, use the
 `getHandler()` function.
 
-    >>> from ao.shorturl import getHandler
-    >>> getHandler()
+    >>> from ao import shorturl
+    >>> shorturl.getHandler()
     Traceback (most recent call last):
     ...
     ImproperlyConfigured: The requested handler is not initialized.
 
-    >>> from ao.shorturl import registerHandler
-    >>> handler = registerHandler()
-    >>> getHandler() is handler
+    >>> handler = shorturl.registerHandler()
+    >>> shorturl.getHandler() is handler
     True
     >>> handler
     <ao.shorturl.BaseShortUrlHandler object at ...>
@@ -31,37 +30,51 @@ the same name on a per-site basis. However, the unnamed handler is still a
 _module_ _global_, so take thet in consideration when using multiple handlers
 and sites.
 
-    >>> foo = registerHandler(name='foo')
-    >>> getHandler(name='foo') is getHandler('foo') is foo
+    >>> foo = shorturl.registerHandler(name='foo')
+    >>> shorturl.getHandler(name='foo') is shorturl.getHandler('foo') is foo
     True
 
 If you don't have the `zope.component` and `zope.interface` packages
 available, you won't be able to use named handlers.
 
-    >>> import __builtin__
-    >>> realimport = __builtin__.__import__
-    >>> def fakeimport(name, *args, **kw):
-    ...     if name == 'zope':
-    ...         raise ImportError
-    ...     realimport(name, *args, **kw)
+Let's pretend we don't have `zope.component` and `zope.interface`:
+
+    >>> import sys
+
+    >>> class _():
+    ...     def __init__(self, modules):
+    ...         self.modules = modules
     ...
-    >>> __builtin__.__import__XXX_TODO = fakeimport
+    ...     def find_module(self, fullname, path=None):
+    ...         if fullname in self.modules:
+    ...             raise ImportError('Debug import failure for %s' % fullname)
+    ...
 
-    >>> import ao.shorturl
-    >>> reload(ao.shorturl)
-    <module 'ao.shorturl' from ...>
+    >>> fail_loader = _(['zope.component', 'zope.interface'])
+    >>> sys.meta_path.append(fail_loader)
 
-    >>> registerHandler(name='bar')
+    >>> for elem in ('zope.component', 'zope.interface'):
+    ...     del sys.modules[elem]
+    ...
+
+    >>> reload(shorturl)
+    <module 'ao.shorturl' from '...'>
+
+    >>> del shorturl.zc  # delete the leftover zope.component module
+
+    >>> shorturl.registerHandler(name='bar')
     Traceback (most recent call last):
     ...
     ImproperlyConfigured: To use named handlers, you need to make the ...
 
-    >>> getHandler('bar')
+    >>> shorturl.getHandler('bar')
     Traceback (most recent call last):
     ...
     ImproperlyConfigured: To use named handlers, you need to make the ...
 
-    >>> __builtin__.__import__ = realimport
+Remove our import hook:
+
+    >>> del sys.meta_path[0]
 
 
 Configuring the handler
@@ -70,13 +83,13 @@ Configuring the handler
 To overwrite any default handler configuration, just pass the apropriate
 keyword argument to the `ao.shorturl.registerHandler()` function.
 
-    >>> len(registerHandler().generate_url())
+    >>> len(shorturl.registerHandler().generate_url())
     6
 
-    >>> len(registerHandler(url_length=10).generate_url())
+    >>> len(shorturl.registerHandler(url_length=10).generate_url())
     10
 
-    >>> registerHandler(url_length=10, url_elems='x').generate_url()
+    >>> shorturl.registerHandler(url_length=10, url_elems='x').generate_url()
     'xxxxxxxxxx'
 
 
@@ -86,21 +99,20 @@ Using custom handlers
 When calling `ao.shorturl.registerHandler()` without a `handler` argument, it
 will not have any real functionality.
 
-    >>> registerHandler().assign_url(None)
+    >>> shorturl.registerHandler().assign_url(None)
     Traceback (most recent call last):
     ...
-    NotImplementedError: You myst overload `assign_url`.
+    NotImplementedError: You must overload `assign_url`.
 
-    >>> registerHandler().construct_url(None)
+    >>> shorturl.registerHandler().construct_url(None)
     Traceback (most recent call last):
     ...
-    NotImplementedError: You myst overload `construct_url`.
+    NotImplementedError: You must overload `construct_url`.
 
 Registering a custom handler is easy, just subclass
 `ao.shorturl.BaseShortUrlHandler`.
 
-    >>> from ao.shorturl import BaseShortUrlHandler
-    >>> class FancyShortUrlHandler(BaseShortUrlHandler):
+    >>> class FancyShortUrlHandler(shorturl.BaseShortUrlHandler):
     ...     def assign_url(self, context):
     ...         context['shorturl'] = self.generate_url()
     ...     def get_context_from_cache(self, url):
@@ -108,7 +120,7 @@ Registering a custom handler is easy, just subclass
     ...             return context
     ...         raise LookupError
     ...
-    >>> handler = registerHandler(handler=FancyShortUrlHandler, url_length=20)
+    >>> handler = shorturl.registerHandler(handler=FancyShortUrlHandler, url_length=20)
     >>> handler
     <FancyShortUrlHandler object at ...>
 
@@ -137,17 +149,28 @@ In your view (if you're using an MCV framework), you can call the handler's
     >>> handler.get_context(context['shorturl']) is context
     True
 
+Note that `ao.shorturl.get_context()` will be called at least once each time a
+new short url is created, to check for duplicates.
 
-Using Django template tags
---------------------------
+    >>> fired = False
+    >>> def get_context(name):
+    ...     global fired
+    ...     if not fired:
+    ...         print 'This URL already exists!'
+    ...         fired = True
+    ...         return 'Dummy context'
+    ...     raise LookupError
+    ...
 
-If you use Django, you can access an object's short URL from a template with
-the `shorturl` template tag. To use it, add `ao.shorturl` to your
-`INSTALLED_APPS`. Then in the template you can do something like this:
+    >>> handler.get_context = get_context
 
-    {% load shorturl %}
-    <a href="{ shorturl city }">{{ city.name }}</a>
+    >>> handler.generate_url()
+    This URL already exists!
+    '...'
 
-Note that this will create an _absolute_ url.
+Clean up after the tests:
+
+    >>> from zope.testing import cleanup
+    >>> cleanup.cleanUp()
 
 

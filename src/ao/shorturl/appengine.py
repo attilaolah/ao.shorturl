@@ -1,4 +1,4 @@
-from ao.shorturl import BaseShortUrlHandler
+import ao.shorturl
 
 from google.appengine.api import memcache
 from google.appengine.ext import db
@@ -10,7 +10,7 @@ class ShortUrl(db.Model):
     context = db.ReferenceProperty(collection_name='shorturl')
 
 
-class AppEngineShortUrlHandler(BaseShortUrlHandler):
+class AppEngineShortUrlHandler(ao.shorturl.BaseShortUrlHandler):
     """Short URL handler for Google App Engine.
 
     Uses the Datastore to store URLs and tokens, and the Memcache API for

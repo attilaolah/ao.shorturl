@@ -1,10 +1,9 @@
-from ao.shorturl import getHandler
+import ao.shorturl
 
-from django.template import Library, Node, Variable
+from django import template
 
 
-handler = getHandler()
-register = Library()
+register = template.Library()
 
 
 def shorturl(parser, token):
@@ -17,15 +16,16 @@ def shorturl(parser, token):
 register.tag(shorturl)
 
 
-class URL(Node):
+class URL(template.Node):
     """The URL node."""
 
     def __init__(self, context):
         """Save the context variable to self.context."""
 
-        self.context = Variable(context)
+        self.context = template.Variable(context)
+        self.handler = ao.shorturl.getHandler()
 
     def render(self, context):
         """Render the link for self.context."""
 
-        return handler.construct_url(self.context.resolve(context))
+        return self.handler.construct_url(self.context.resolve(context))
