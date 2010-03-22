@@ -28,7 +28,7 @@ class AppEngineShortUrlHandler(ao.shorturl.BaseShortUrlHandler):
 
         key = memcache.get(url)
         if key is None:
-            raise LookupError
+            raise LookupError('Context key not found in the cache.')
 
         return db.get(key)
 
@@ -37,7 +37,7 @@ class AppEngineShortUrlHandler(ao.shorturl.BaseShortUrlHandler):
 
         mapping = ShortUrl.get_by_key_name(url)
         if mapping is None:
-            raise LookupError
+            raise LookupError('Context not found in the datastore.')
 
         return mapping.context
 

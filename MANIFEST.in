@@ -1,2 +1,2 @@
-include *.txt
-include src/ao/shorturl/*.txt
+include *.rst
+include src/ao/shorturl/*.rst

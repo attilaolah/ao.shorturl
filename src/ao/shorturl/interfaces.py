@@ -19,5 +19,5 @@ class IShortUrlHandler(Interface):
     def assign_url(context):
         """Create a new URL for the context and assign it to the context."""
 
-    def construct_url(context):
+    def construct_url(context, request):
         """Construct the short url for the given context."""

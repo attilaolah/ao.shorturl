@@ -2,7 +2,7 @@ import doctest
 import unittest
 
 
-docfiles = ('shorturl.txt', 'django.txt')
+docfiles = ('shorturl.rst', 'django.rst', 'appengine.rst')
 
 docstrings = ('ao.shorturl',)
 

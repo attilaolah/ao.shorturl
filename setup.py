@@ -6,16 +6,17 @@ from setuptools import find_packages, setup
 setup(
     # Package information:
     name='ao.shorturl',
-    version='1.1.6',
+    version='1.1.7',
     license='GNU GPL',
     url='http://github.com/aatiis/ao.shorturl',
     description='Reusable url shortener and lookup library.',
     long_description=\
-        open('README.txt').read() + \
-        open(os.path.join('src', 'ao', 'shorturl', 'shorturl.txt')).read() + \
-        open(os.path.join('src', 'ao', 'shorturl', 'django.txt')).read() + \
-        open('TODO.txt').read() + \
-        open('CHANGES.txt').read(),
+        open('README.rst').read() + \
+        open(os.path.join('src', 'ao', 'shorturl', 'shorturl.rst')).read() + \
+        open(os.path.join('src', 'ao', 'shorturl', 'django.rst')).read() + \
+        open(os.path.join('src', 'ao', 'shorturl', 'appengine.rst')).read() + \
+        open('TODO.rst').read() + \
+        open('CHANGES.rst').read(),
     # Author information:
     author='Attila Olah',
     author_email='attilaolah@gmail.com',
@@ -26,12 +27,14 @@ setup(
     include_package_data=True,
     zip_safe=True,
     tests_require=(
+        'minimock',
         'zope.component',
         'zope.interface',
         'zope.testing',
     ),
     extras_require={
         'test': (
+            'minimock',
             'zope.component',
             'zope.interface',
             'zope.testing',

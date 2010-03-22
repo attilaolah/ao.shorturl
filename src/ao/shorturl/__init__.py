@@ -139,12 +139,12 @@ class BaseShortUrlHandler(object):
     def get_context_from_cache(self, url):
         """Overload this method to look up the cached context."""
 
-        raise LookupError
+        raise LookupError('Overload this method to enable the cache.')
 
     def get_context_from_db(self, url):
         """Overload this method to look up the context in the database."""
 
-        raise LookupError
+        raise LookupError('Overload this method to enable the database.')
 
     def generate_url(self, len=None, elems=None):
         """Generate (a random) new url.
@@ -172,7 +172,7 @@ class BaseShortUrlHandler(object):
 
         raise NotImplementedError('You must overload `assign_url`.')
 
-    def construct_url(self, context):
+    def construct_url(self, context, request=None):
         """Construct the short url for the given context."""
 
         raise NotImplementedError('You must overload `construct_url`.')

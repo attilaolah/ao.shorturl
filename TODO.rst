@@ -1,5 +1,4 @@
 TODO
 ====
 
-* Write unit tests for the App Engine backend
 * Add backends for Django Models and SQLAlchemy/Elixir
