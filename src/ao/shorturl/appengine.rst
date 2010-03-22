@@ -81,15 +81,28 @@ Otherwise it raises a ``LookupError``::
 
 Try to construct a URL::
 
+    >>> class FakeQuery(list):
+    ...     def count(self):
+    ...         return 0
+    ...
+
     >>> ao.shorturl.appengine.ShortUrl.mock_returns = minimock.Mock('shorturl')
 
     >>> context = minimock.Mock('context')
-    >>> context.shorturl.count.mock_returns = 0
+    >>> fakeurl = minimock.Mock('shorturl')
+    >>> fakekey = minimock.Mock('shorturl.key')
+    >>> fakekey.name.mock_returns = 'fooname'
+    >>> fakeurl.key.mock_returns = fakekey
+    >>> context.shorturl = FakeQuery((fakeurl,))
 
     >>> handler.construct_url(context)
-    Traceback (most recent call last):
-    ...
-    TypeError: 'Mock' object is unindexable
+    Called google.appengine.api.memcache.get('...')
+    Called ShortUrl.get_by_key_name('...')
+    Called ShortUrl(context=<Mock ... context>, key_name='...')
+    Called shorturl.put()
+    Called shorturl.key()
+    Called shorturl.key.name()
+    '/fooname'
 
 Clean up after the tests::
 
