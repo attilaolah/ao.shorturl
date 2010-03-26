@@ -79,11 +79,6 @@ class BaseShortUrlHandler(object):
 
     This class contains a set of defaults for the Short URL handler.
 
-    * `url_cache_time` is the maximum lifetime of a (url, key) pair in cache.
-    * `url_elems` is a sequence that is used when generating new URLs.
-    * `url_length` is the length of the generated URLs.
-    * `url_prefx` is the path that prefixes the URLs.
-
     Verify that the class implements the interface:
 
         >>> from zope.interface.verify import verifyClass

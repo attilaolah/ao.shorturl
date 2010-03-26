@@ -1,8 +1,22 @@
-from zope.interface import Interface
+import zope.interface as zi
 
 
-class IShortUrlHandler(Interface):
+class IShortUrlHandler(zi.Interface):
     """Interface for ShortUrlHandler objects."""
+
+    url_cache_time = zi.Attribute(
+        u'The maximum lifetime of a (url, key) pair in cache.',
+    )
+    url_elems = zi.Attribute(
+        u'A sequence that is used when generating new URLs.',
+    )
+    url_length = zi.Attribute(
+        u'The length of the generated URLs.',
+    )
+    url_prefix = zi.Attribute(
+        u'The path that prefixes the URLs.',
+    )
+
 
     def cache_context(url, context):
         """Cache the context (i.e. using memcache)."""
